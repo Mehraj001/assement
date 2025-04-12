@@ -13,7 +13,6 @@ const seatRoutes = require('./routes/seats');
 const app = express();
 const PORT = process.env.PORT || 5000;
 PORT=5000
-MONGO_URI=mongodb+srv://infusionpvtltd:vcLkKLKcKZgez7ur@cluster0.ta8g3.mongodb.net/ticketbooking?retryWrites=true&w=majority&appName=Cluster0
 JWT_SECRET=train_ticket_booking_secret_key 
 // Middleware here
 app.use(
@@ -26,7 +25,7 @@ app.use(
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(`mongodb+srv://infusionpvtltd:vcLkKLKcKZgez7ur@cluster0.ta8g3.mongodb.net/ticketbooking?retryWrites=true&w=majority&appName=Cluster0`, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
