@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User2 = require('../models/User');
 
 const auth = async (req, res, next) => {
   try {
@@ -10,7 +10,7 @@ const auth = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
   
-    const user = await User.findById(decoded.id);
+    const user = await User2.findById(decoded.id);
     
     if (!user) {
       throw new Error();
