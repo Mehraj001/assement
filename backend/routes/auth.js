@@ -1,11 +1,20 @@
-
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User2 = require('../models/User');
 const auth = require('../middleware/auth');
 
-// JWT secret will be accessed from app.locals.config
+
+const getConfig = (req) => {
+
+  if (!req.app.locals.config) {
+    return {
+      jwtSecret: process.env.JWT_SECRET || 'train_ticket_booking_secret_key',
+      jwtOptions: { expiresIn: '1d' }
+    };
+  }
+  return req.app.locals.config;
+};
 
 router.post('/register', async (req, res) => {
   try {
@@ -26,11 +35,14 @@ router.post('/register', async (req, res) => {
     
     await user.save();
     
-    // Create and sign a JWT using config
+   
+    const config = getConfig(req);
+    
+   
     const token = jwt.sign(
       { id: user._id }, 
-      req.app.locals.config.jwtSecret,
-      req.app.locals.config.jwtOptions
+      config.jwtSecret,
+      config.jwtOptions
     );
     
     res.status(201).json({
@@ -42,8 +54,8 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
@@ -63,11 +75,14 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
     
-    // Create and sign a JWT using config
+    // Get config with fallback
+    const config = getConfig(req);
+    
+    // Create and sign a JWT
     const token = jwt.sign(
       { id: user._id }, 
-      req.app.locals.config.jwtSecret,
-      req.app.locals.config.jwtOptions
+      config.jwtSecret,
+      config.jwtOptions
     );
     
     res.json({
@@ -79,11 +94,10 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
 
 router.get('/user', auth, async (req, res) => {
   try {
@@ -96,4 +110,3 @@ router.get('/user', auth, async (req, res) => {
 });
 
 module.exports = router; 
-
