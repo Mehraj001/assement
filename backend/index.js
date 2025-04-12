@@ -1,46 +1,49 @@
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');               
-const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 
-
-dotenv.config();
-
-// Import Routes
 const authRoutes = require('./routes/auth');
 const seatRoutes = require('./routes/seats');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-PORT=5000
-JWT_SECRET=train_ticket_booking_secret_key 
-// Middleware here
-app.use(
-  cors({
-    origin: ["https://assement-front.vercel.app"], // Replace '*' with the specific origin(s) you want to allow, e.g., 'https://yourdomain.com'
-    methods: ['POST', 'GET', 'PUT', 'DELETE'], // Define allowed HTTP methods
-    credentials: true, // Allow credentials like cookies to be sent
-  })
-);
+
+// ✅ Define variables directly
+const PORT = 5000;
+const JWT_SECRET = 'train_ticket_booking_secret_key';
+
+// ✅ Middleware
+app.use(cors({
+  origin: 'https://assement-front.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
+
+// ✅ Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect(`mongodb+srv://infusionpvtltd:vcLkKLKcKZgez7ur@cluster0.ta8g3.mongodb.net/ticketbooking?retryWrites=true&w=majority&appName=Cluster0`, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+// ✅ MongoDB Connection
+mongoose.connect(
+  'mongodb+srv://infusionpvtltd:vcLkKLKcKZgez7ur@cluster0.ta8g3.mongodb.net/ticketbooking?retryWrites=true&w=majority&appName=Cluster0',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+)
 .then(() => console.log('MongoDB Atlas connected'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-// Routes
+// ✅ Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/seats', seatRoutes);
 
+// ✅ Default route
 app.get('/', (req, res) => {
   res.send('Ticket Booking API is running');
 });
 
-// Start the server
+// ✅ Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-}); 
+});
